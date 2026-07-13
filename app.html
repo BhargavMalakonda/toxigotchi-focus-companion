@@ -1,0 +1,2365 @@
+<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" /> <title>ToxiGotchi — Focus or Else</title> 
+  
+  <!-- Firebase SDK (CDN version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDAHDJX_isTq-x_BTPWBscUrOfd-0cCOI0",
+      authDomain: "toxigotchi.firebaseapp.com",
+      projectId: "toxigotchi",
+      storageBucket: "toxigotchi.firebasestorage.app",
+      messagingSenderId: "490464741627",
+      appId: "1:490464741627:web:9268d7ad261b2f3692085e"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    console.log("🔥 Firebase initialized!");
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap" rel="stylesheet"> 
+  <style> 
+    /* ══════════════════════════════════════════════════════════════════ TOXIGOTCHI — NEO-BRUTALISM UI SYSTEM Palette: Bone white bg · Toxic yellow card · Black structure Accents: Neon orange streak · Terminal green roast · Red danger ══════════════════════════════════════════════════════════════════ */ 
+    :root { 
+      /* Core palette */ 
+      --ink: #0A0A0A; 
+      --bone: #F5F0E8; 
+      --yellow: #FFE500; 
+      --orange: #FF6B00; 
+      --green: #00FF41; 
+      --red: #FF1744; 
+      --purple: #C8B4FF; 
+      --white: #FFFFFF; 
+      --terminal: #0D0D0D; 
+      /* Structural */ 
+      --border: 3px solid var(--ink); 
+      --shadow: 5px 5px 0 var(--ink); 
+      --shadow-sm: 3px 3px 0 var(--ink); 
+      --shadow-lg: 8px 8px 0 var(--ink); 
+      --font-ui: 'Space Mono', monospace; 
+      --font-hero: 'Press Start 2P', monospace; 
+    } 
+
+    /* ── Reset ───────────────────────────────────────────────────── */ 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } 
+    html { scroll-behavior: smooth; } 
+
+    /* ── Page — dot-grid brutalist background ──────────────────── */ 
+    body { 
+      min-height: 100vh; 
+      background-color: var(--bone); 
+      background-image: radial-gradient(circle, rgba(0,0,0,.18) 1px, transparent 1px); 
+      background-size: 22px 22px; 
+      color: var(--ink); 
+      font-family: var(--font-ui); 
+      display: flex; 
+      align-items: flex-start; 
+      justify-content: center; 
+      padding: 36px 16px 80px; 
+      overflow-x: hidden; 
+      position: relative; 
+    } 
+
+    /* CRT scanlines — very subtle on the light bg */ 
+    body::after { 
+      content: ''; 
+      position: fixed; 
+      inset: 0; 
+      background: repeating-linear-gradient( 0deg, transparent, transparent 3px, rgba(0,0,0,.03) 3px, rgba(0,0,0,.03) 4px ); 
+      pointer-events: none; 
+      z-index: 9999; 
+    } 
+
+    /* ── Shake penalty ───────────────────────────────────────── */ 
+    @keyframes shake { 
+      0% { transform: translate(3px, 2px) rotate(0deg); } 
+      10% { transform: translate(-2px, -3px) rotate(-1deg); } 
+      20% { transform: translate(-4px, 1px) rotate(1deg); } 
+      30% { transform: translate(1px, 3px) rotate(0deg); } 
+      40% { transform: translate(2px, -2px) rotate(1deg); } 
+      50% { transform: translate(-2px, 3px) rotate(-1deg); } 
+      60% { transform: translate(-4px, 1px) rotate(0deg); } 
+      70% { transform: translate(3px, 2px) rotate(-1deg); } 
+      80% { transform: translate(-2px, -2px) rotate(1deg); } 
+      90% { transform: translate(3px, 3px) rotate(0deg); } 
+      100% { transform: translate(2px, -3px) rotate(-1deg); } 
+    } 
+    .shake-screen { 
+      animation: shake 0.35s infinite; 
+      background-color: #CC0000 !important; 
+      background-image: none !important; 
+    } 
+    .runaway-btn { 
+      transition: top 0.09s ease-out, left 0.09s ease-out; 
+    } 
+
+    /* ══════════════════════════════════════════════════════════════ OUTER WRAPPER — offset shadow trick for depth ══════════════════════════════════════════════════════════════ */ 
+    .card { 
+      width: min(540px, 96vw); 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+    } 
+
+    /* ══════════════════════════════════════════════════════════════ HEADER — full-bleed black bar, yellow title ══════════════════════════════════════════════════════════════ */ 
+    .header { 
+      background: var(--ink); 
+      border: var(--border); 
+      padding: 0; 
+      display: grid; 
+      grid-template-columns: 1fr auto auto; 
+      align-items: stretch; 
+      position: relative; 
+      box-shadow: var(--shadow); 
+    } 
+    .header__brand { 
+      padding: 16px 20px; 
+      border-right: var(--border); 
+    } 
+    .header__eyebrow { 
+      font-size: 7px; 
+      letter-spacing: 4px; 
+      color: #555; 
+      text-transform: uppercase; 
+      margin-bottom: 4px; 
+    } 
+    .header__title { 
+      font-family: var(--font-hero); 
+      font-size: clamp(14px, 3.8vw, 20px); 
+      color: var(--yellow); 
+      letter-spacing: 2px; 
+      line-height: 1.3; 
+      animation: flicker 9s infinite; 
+    } 
+    @keyframes flicker { 
+      0%,88%,90%,92%,100% { opacity: 1; } 
+      89%,91% { opacity: .3; } 
+    } 
+
+    /* Streak badge — orange pill in header */ 
+    #streak-counter { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      background: var(--orange); 
+      color: var(--white); 
+      font-size: 9px; 
+      font-weight: 700; 
+      letter-spacing: 1px; 
+      padding: 0 16px; 
+      white-space: nowrap; 
+      border-right: var(--border); 
+      border-left: var(--border); 
+    } 
+    #streak-counter .fire { 
+      display: inline-block; 
+      animation: fire-pulse 1.3s ease-in-out infinite; 
+      transform-origin: center bottom; 
+    } 
+    @keyframes fire-pulse { 
+      0%,100% { transform: scale(1); } 
+      50% { transform: scale(1.35); } 
+    } 
+
+    /* Login button in header */
+    #login-btn-header {
+      font-family: var(--font-ui);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 0 12px;
+      border: none;
+      border-left: 2px solid #222;
+      color: var(--green);
+      background: transparent;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background .12s, color .12s;
+    }
+    #login-btn-header:hover {
+      background: #1a1a1a;
+      color: #00ff41;
+    }
+
+    /* Leaderboards button */ 
+    #shame-btn { 
+      font-family: var(--font-ui); 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 1px; 
+      padding: 0 18px; 
+      border: none; 
+      border-left: 2px solid #222; 
+      color: var(--yellow); 
+      background: transparent; 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      transition: background .12s, color .12s; 
+      position: static; 
+    } 
+    #shame-btn:hover { 
+      background: #1a1a1a; 
+    } 
+    #shame-btn:active { 
+      background: #333; 
+    } 
+
+    /* User profile */
+    #user-profile {
+      background: var(--ink);
+      border: var(--border);
+      border-top: none;
+      padding: 8px 16px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--white);
+      font-size: 9px;
+      box-shadow: var(--shadow);
+    }
+    #user-profile span {
+      color: var(--yellow);
+    }
+    #logout-btn {
+      background: transparent;
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 4px 10px;
+      font-size: 7px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ CONTENT PANEL — toxic yellow, connects to header ══════════════════════════════════════════════════════════════ */ 
+    .content-panel { 
+      background: var(--yellow); 
+      border: var(--border); 
+      border-top: none; 
+      padding: 20px 18px 22px; 
+      box-shadow: var(--shadow-lg); 
+      display: flex; 
+      flex-direction: column; 
+      gap: 14px; 
+    } 
+
+    /* ══════════════════════════════════════════════════════════════ SETUP SCREEN ══════════════════════════════════════════════════════════════ */ 
+    #setup-screen { 
+      width: 100%; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+    } 
+
+    /* Streak danger widget */ 
+    #streak-widget-card { 
+      background: var(--orange); 
+      border: var(--border); 
+      box-shadow: var(--shadow); 
+      padding: 14px 16px; 
+      display: flex; 
+      align-items: center; 
+      gap: 14px; 
+      position: relative; 
+      overflow: hidden; 
+    } 
+    /* diagonal stripe accent */ 
+    #streak-widget-card::after { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      right: 0; 
+      width: 60px; 
+      height: 100%; 
+      background: repeating-linear-gradient( -45deg, transparent, transparent 4px, rgba(0,0,0,.12) 4px, rgba(0,0,0,.12) 8px ); 
+      pointer-events: none; 
+    } 
+    .streak-widget__fire { 
+      font-size: clamp(42px, 11vw, 54px); 
+      line-height: 1; 
+      flex-shrink: 0; 
+      animation: fire-pulse 1.3s ease-in-out infinite; 
+    } 
+    .streak-widget__text { 
+      flex: 1; 
+      min-width: 0; 
+    } 
+    .streak-widget__title { 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 3px; 
+      color: rgba(255,255,255,.75); 
+      text-transform: uppercase; 
+      margin-bottom: 5px; 
+    } 
+    .streak-widget__body { 
+      font-size: 11px; 
+      color: var(--white); 
+      line-height: 1.5; 
+    } 
+    .streak-widget__body strong { 
+      font-weight: 700; 
+    } 
+
+    /* Setup headings */ 
+    .setup__title { 
+      font-family: var(--font-hero); 
+      font-size: clamp(11px, 3vw, 15px); 
+      color: var(--ink); 
+      text-align: center; 
+      letter-spacing: 1px; 
+      line-height: 1.6; 
+      padding: 4px 0; 
+    } 
+    .setup__subtitle { 
+      font-size: 8px; 
+      letter-spacing: 3px; 
+      color: rgba(0,0,0,.45); 
+      text-align: center; 
+      text-transform: uppercase; 
+      margin-top: -6px; 
+    } 
+
+    /* Fields */ 
+    .setup__field { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 5px; 
+    } 
+    .setup__label { 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 3px; 
+      color: var(--ink); 
+      text-transform: uppercase; 
+    } 
+    .setup__input { 
+      font-family: var(--font-ui); 
+      font-size: 13px; 
+      font-weight: 700; 
+      background: var(--white); 
+      border: var(--border); 
+      color: var(--ink); 
+      padding: 11px 14px; 
+      outline: none; 
+      width: 100%; 
+      box-shadow: var(--shadow-sm); 
+      transition: box-shadow .1s, transform .1s; 
+      caret-color: var(--ink); 
+      border-radius: 0; 
+      -webkit-appearance: none; 
+    } 
+    .setup__input:focus { 
+      box-shadow: 6px 6px 0 var(--ink); 
+      transform: translate(-1px, -1px); 
+    } 
+    .setup__input::placeholder { 
+      color: #bbb; 
+      font-weight: 400; 
+    } 
+    .setup__row { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+    } 
+    .setup__input[type="number"]::-webkit-inner-spin-button, 
+    .setup__input[type="number"]::-webkit-outer-spin-button { 
+      opacity: 1; 
+    } 
+
+    /* Lock In */ 
+    #lock-in-btn { 
+      font-family: var(--font-hero); 
+      font-size: clamp(9px, 2.4vw, 12px); 
+      letter-spacing: 1px; 
+      padding: 18px; 
+      border: var(--border); 
+      color: var(--yellow); 
+      background: var(--ink); 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      box-shadow: var(--shadow); 
+      transition: transform .06s, box-shadow .06s; 
+      position: static; 
+      margin-top: 4px; 
+    } 
+    #lock-in-btn:hover { 
+      background: #1e1e1e; 
+    } 
+    #lock-in-btn:active { 
+      transform: translate(5px,5px); 
+      box-shadow: 0 0 0 var(--ink); 
+    } 
+
+    /* ══════════════════════════════════════════════════════════════ MAIN APP ══════════════════════════════════════════════════════════════ */ 
+    #main-app { 
+      display: none; 
+      flex-direction: column; 
+      align-items: stretch; 
+      gap: 10px; 
+      width: 100%; 
+    } 
+
+    /* Goal banner */ 
+    #current-goal-display { 
+      font-size: 9px; 
+      font-weight: 700; 
+      color: var(--ink); 
+      letter-spacing: 2px; 
+      background: var(--white); 
+      border: var(--border); 
+      padding: 9px 14px; 
+      text-align: center; 
+      text-overflow: ellipsis; 
+      overflow: hidden; 
+      white-space: nowrap; 
+      box-shadow: var(--shadow-sm); 
+      text-transform: uppercase; 
+    } 
+
+    /* Session tracker strip */ 
+    #session-tracker { 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px; 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 3px; 
+      color: rgba(0,0,0,.45); 
+      text-transform: uppercase; 
+      padding: 7px 0 5px; 
+      border-bottom: 2px solid var(--ink); 
+    } 
+    #session-tracker span { 
+      color: var(--ink); 
+    } 
+    #session-tracker.break-mode { 
+      border-bottom-color: var(--orange); 
+    } 
+    #session-tracker.break-mode span { 
+      color: var(--orange); 
+    } 
+
+    /* ── TIMER BOX ─────────────────────────────────────────────── */ 
+    .timer-box { 
+      background: var(--white); 
+      border: var(--border); 
+      box-shadow: var(--shadow); 
+      padding: 14px 6px 10px; 
+      text-align: center; 
+      position: relative; 
+      overflow: hidden;
+      width: 100%;
+    }
+    /* small "FOCUS" / "BREAK" label top-left of timer box */ 
+    .timer-box::before { 
+      content: attr(data-label); 
+      position: absolute; 
+      top: -1px; 
+      left: -1px; 
+      background: var(--ink); 
+      color: var(--yellow); 
+      font-family: var(--font-hero); 
+      font-size: 7px; 
+      letter-spacing: 2px; 
+      padding: 3px 8px; 
+    } 
+    #timer-display { 
+  font-family: var(--font-hero); 
+  font-size: clamp(42px, 14vw, 84px); 
+  line-height: 1; 
+  color: var(--ink); 
+  letter-spacing: 2px; 
+  transition: color .25s;
+
+  display: block;
+  width: 100%;
+  text-align: center;
+
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+    #timer-display.danger { 
+      color: var(--red); 
+      animation: pulse-timer .55s infinite; 
+    } 
+    @keyframes pulse-timer { 
+      0%,100% { opacity: 1; } 
+      50% { opacity: .45; } 
+    } 
+
+    /* ── HEALTH BAR — fighting game style ──────────────────────── */ 
+    .health-wrapper { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 4px;
+      width: 100%;
+    } 
+    .health-label-row { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    } 
+    .health-label { 
+      font-size: 7px; 
+      font-weight: 700; 
+      letter-spacing: 3px; 
+      text-transform: uppercase; 
+      color: var(--ink); 
+    } 
+    #health-container { 
+      width: 100% !important; 
+      margin: 0 !important; 
+      background: var(--ink) !important; 
+      border: var(--border) !important; 
+      border-radius: 0 !important; 
+      height: 32px !important; 
+      box-shadow: var(--shadow-sm); 
+      position: relative !important; 
+      overflow: hidden; 
+    } 
+    /* segmented tick marks overlay */ 
+    #health-container::after { 
+      content: ''; 
+      position: absolute; 
+      inset: 0; 
+      background: repeating-linear-gradient( 90deg, transparent, transparent calc(10% - 2px), rgba(0,0,0,.35) calc(10% - 2px), rgba(0,0,0,.35) 10% ); 
+      pointer-events: none; 
+      z-index: 1; 
+    } 
+    #health-bar { 
+      height: 100% !important; 
+      border-radius: 0 !important; 
+      transition: width 0.35s cubic-bezier(.4,0,.2,1), background-color 0.35s ease !important; 
+    } 
+    #health-text { 
+      font-family: var(--font-hero) !important; 
+      font-size: 9px !important; 
+      top: 50% !important; 
+      transform: translateY(-50%) !important; 
+      text-shadow: 1px 1px 0 rgba(0,0,0,.8) !important; 
+      letter-spacing: 2px !important; 
+      z-index: 2; 
+      position: absolute !important; 
+    } 
+
+    /* ── PET DISPLAY AREA ──────────────────────────────────────── */ 
+    .pet-stage { 
+      background: var(--white); 
+      border: var(--border); 
+      box-shadow: var(--shadow-sm); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 8px 0 4px; 
+      min-height: 130px; 
+      position: relative; 
+      overflow: hidden; 
+    } 
+    /* halftone floor dot pattern */ 
+    .pet-stage::before { 
+      content: ''; 
+      position: absolute; 
+      bottom: 0; 
+      left: 0; 
+      right: 0; 
+      height: 30px; 
+      background: radial-gradient(circle, rgba(0,0,0,.08) 1px, transparent 1px); 
+      background-size: 10px 10px; 
+    } 
+    #pet-image { 
+      font-size: 90px !important; 
+      line-height: 1 !important; 
+      display: block !important; 
+      text-align: center !important; 
+      margin: 0 auto !important; 
+      filter: drop-shadow(4px 4px 0 rgba(0,0,0,.2)) !important; 
+      animation: pet-idle 2.4s ease-in-out infinite; 
+      user-select: none; 
+      position: relative; 
+      z-index: 1; 
+    } 
+    #pet-image.angry { 
+      animation: pet-rage .2s infinite; 
+    } 
+    #pet-image.happy { 
+      animation: pet-bounce .4s ease-in-out infinite alternate; 
+    } 
+    @keyframes pet-idle { 
+      0%,100% { transform: translateY(0) rotate(0deg); } 
+      40% { transform: translateY(-10px) rotate(-2deg); } 
+      60% { transform: translateY(-10px) rotate(2deg); } 
+    } 
+    @keyframes pet-rage { 
+      0%,100% { transform: translateX(0) rotate(0deg) scale(1); } 
+      25% { transform: translateX(-7px) rotate(-6deg) scale(1.05); } 
+      75% { transform: translateX(7px) rotate(6deg) scale(1.05); } 
+    } 
+    @keyframes pet-bounce { 
+      from { transform: translateY(0) scale(1); } 
+      to { transform: translateY(-14px) scale(1.08); } 
+    } 
+
+    /* ── ROAST BOX — hacker terminal ───────────────────────────── */ 
+    .roast-wrapper { 
+      width: 100%; 
+      border: var(--border); 
+      background: var(--terminal); 
+      box-shadow: var(--shadow); 
+      position: relative; 
+    } 
+    /* terminal title bar */ 
+    .roast-wrapper::before { 
+      content: '● ● ● TOXIGOTCHI.EXE'; 
+      display: block; 
+      background: #1E1E1E; 
+      border-bottom: 2px solid #333; 
+      color: #444; 
+      font-size: 7px; 
+      letter-spacing: 2px; 
+      padding: 5px 10px; 
+    } 
+    .roast-prompt { 
+      display: flex; 
+      align-items: flex-start; 
+      gap: 8px; 
+      padding: 12px 14px 14px; 
+    } 
+    .roast-prompt::before { 
+      content: '>'; 
+      color: var(--green); 
+      font-size: 14px; 
+      font-weight: 700; 
+      flex-shrink: 0; 
+      line-height: 1.7; 
+    } 
+    #roast-box { 
+      font-family: var(--font-ui); 
+      font-size: clamp(10px, 2.8vw, 12px); 
+      color: var(--green); 
+      min-height: 42px; 
+      line-height: 1.8; 
+      white-space: pre-wrap; 
+      flex: 1; 
+    } 
+    #roast-box.bad { 
+      color: #FF4466; 
+    } 
+    #roast-box::after { 
+      content: '█'; 
+      animation: blink .75s step-start infinite; 
+      margin-left: 2px; 
+      font-size: .8em; 
+    } 
+    @keyframes blink { 
+      0%,100% { opacity: 1; } 
+      50% { opacity: 0; } 
+    } 
+
+    /* ── APOLOGY INPUT ─────────────────────────────────────────── */ 
+    #apology-input { 
+      display: none; 
+      width: 100%; 
+      font-family: var(--font-ui); 
+      font-size: 12px; 
+      font-weight: 700; 
+      background: var(--white); 
+      border: 3px solid var(--red); 
+      color: var(--ink); 
+      padding: 13px 14px; 
+      outline: none; 
+      box-shadow: 4px 4px 0 var(--red); 
+      caret-color: var(--red); 
+      border-radius: 0; 
+      -webkit-appearance: none; 
+      transition: box-shadow .1s; 
+    } 
+    #apology-input::placeholder { 
+      color: #ccc; 
+      font-weight: 400; 
+    } 
+    #apology-input:focus { 
+      box-shadow: 6px 6px 0 var(--red); 
+    } 
+
+    /* ── ACTION BUTTONS ────────────────────────────────────────── */ 
+    .btn-row { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+    } 
+    button { 
+      font-family: var(--font-ui); 
+      font-size: clamp(9px, 2.5vw, 11px); 
+      font-weight: 700; 
+      letter-spacing: 1px; 
+      padding: 14px 8px; 
+      border: var(--border); 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      box-shadow: var(--shadow-sm); 
+      transition: transform .06s, box-shadow .06s, background .1s; 
+      position: relative; 
+      border-radius: 0; 
+      -webkit-appearance: none; 
+    } 
+    button:active:not(:disabled) { 
+      transform: translate(5px, 5px); 
+      box-shadow: 0 0 0 var(--ink); 
+    } 
+    #start-btn { 
+      background: var(--ink); 
+      color: var(--yellow); 
+      border-color: var(--ink); 
+    } 
+    #start-btn:hover:not(:disabled) { 
+      background: #222; 
+    } 
+    #start-btn:disabled { 
+      opacity: .3; 
+      cursor: not-allowed; 
+      box-shadow: none; 
+    } 
+    #give-up-btn { 
+      background: var(--white); 
+      color: var(--red); 
+      border-color: var(--red); 
+      box-shadow: 3px 3px 0 var(--red); 
+    } 
+    #give-up-btn:hover:not(:disabled) { 
+      background: #FFF5F5; 
+    } 
+    #give-up-btn:active:not(:disabled) { 
+      transform: translate(5px,5px); 
+      box-shadow: 0 0 0 var(--red); 
+    } 
+    #give-up-btn:disabled { 
+      opacity: .3; 
+      cursor: not-allowed; 
+      box-shadow: none; 
+    } 
+
+    /* ── FOOTER ────────────────────────────────────────────────── */ 
+    .footer { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      padding-top: 10px; 
+      border-top: 2px solid var(--ink); 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 2px; 
+      color: rgba(0,0,0,.45); 
+      text-transform: uppercase; 
+    } 
+    #status-label { 
+      background: var(--ink); 
+      color: var(--yellow); 
+      padding: 3px 8px; 
+      font-size: 7px; 
+      letter-spacing: 2px; 
+    } 
+
+    /* ══════════════════════════════════════════════════════════════ COMPLETION SCREEN ══════════════════════════════════════════════════════════════ */ 
+    #completion-screen { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      z-index: 2000; 
+      background: var(--ink); 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 22px; 
+      padding: 40px 28px; 
+      text-align: center; 
+    } 
+    .completion__trophy { 
+      font-size: clamp(72px, 18vw, 100px); 
+      line-height: 1; 
+      animation: trophy-glow 2s ease-in-out infinite alternate; 
+    } 
+    @keyframes trophy-glow { 
+      from { filter: drop-shadow(0 0 16px gold); transform: scale(1); } 
+      to { filter: drop-shadow(0 0 48px gold); transform: scale(1.07); } 
+    } 
+    .completion__title { 
+      font-family: var(--font-hero); 
+      font-size: clamp(18px, 5.5vw, 30px); 
+      color: var(--yellow); 
+      letter-spacing: 2px; 
+      line-height: 1.5; 
+    } 
+    .completion__goal { 
+      font-size: clamp(10px, 2.8vw, 13px); 
+      color: #666; 
+      letter-spacing: 1px; 
+      max-width: 380px; 
+      line-height: 1.9; 
+    } 
+    .completion__goal strong { 
+      color: var(--white); 
+    } 
+    .completion__btn-row { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      width: min(340px, 88vw); 
+    } 
+    #new-task-btn { 
+      font-family: var(--font-ui); 
+      font-size: 11px; 
+      font-weight: 700; 
+      letter-spacing: 2px; 
+      padding: 16px; 
+      border: var(--border); 
+      color: var(--ink); 
+      background: var(--yellow); 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      box-shadow: var(--shadow); 
+      transition: transform .06s, box-shadow .06s; 
+      position: static; 
+    } 
+    #new-task-btn:active { 
+      transform: translate(5px,5px); 
+      box-shadow: 0 0 0 var(--ink); 
+    } 
+    #enough-btn { 
+      font-family: var(--font-ui); 
+      font-size: 11px; 
+      font-weight: 700; 
+      letter-spacing: 2px; 
+      padding: 16px; 
+      border: 3px solid #333; 
+      color: #555; 
+      background: transparent; 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      box-shadow: 3px 3px 0 #333; 
+      transition: transform .06s, box-shadow .06s, color .1s, border-color .1s; 
+      position: static; 
+    } 
+    #enough-btn:hover { 
+      border-color: var(--red); 
+      color: var(--red); 
+      box-shadow: 3px 3px 0 var(--red); 
+    } 
+    #enough-btn:active { 
+      transform: translate(5px,5px); 
+      box-shadow: 0 0 0 var(--ink); 
+    } 
+    .completion__enough-msg { 
+      font-family: var(--font-hero); 
+      font-size: clamp(12px, 3.5vw, 18px); 
+      color: var(--green); 
+      letter-spacing: 2px; 
+      display: none; 
+      line-height: 1.7; 
+    } 
+
+    /* ══════════════════════════════════════════════════════════════ LEADERBOARD MODAL ══════════════════════════════════════════════════════════════ */ 
+    #shame-modal { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      z-index: 1000; 
+      align-items: center; 
+      justify-content: center; 
+    } 
+    .shame-modal__backdrop { 
+      position: absolute; 
+      inset: 0; 
+      background: rgba(0,0,0,.78); 
+    } 
+    .shame-modal__box { 
+      position: relative; 
+      z-index: 1; 
+      width: min(500px, 94vw); 
+      background: var(--white); 
+      border: var(--border); 
+      padding: 0; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 0; 
+      box-shadow: var(--shadow-lg); 
+      overflow: hidden; 
+    } 
+    /* red header stripe */ 
+    .shame-modal__header { 
+      background: var(--red); 
+      padding: 16px 20px 14px; 
+      text-align: center; 
+      border-bottom: var(--border); 
+    } 
+    .shame-modal__eyebrow { 
+      font-size: 7px; 
+      letter-spacing: 3px; 
+      color: rgba(255,255,255,.6); 
+      display: block; 
+      margin-bottom: 5px; 
+      text-transform: uppercase; 
+    } 
+    .shame-modal__title { 
+      font-family: var(--font-hero); 
+      font-size: clamp(12px, 3.5vw, 17px); 
+      color: var(--white); 
+      letter-spacing: 1px; 
+      line-height: 1.4; 
+    } 
+    .shame-modal__subtitle { 
+      font-size: 10px; 
+      color: rgba(255,255,255,.7); 
+      margin-top: 4px; 
+      letter-spacing: 1px; 
+    } 
+    .shame-modal__body { 
+      padding: 16px 18px 18px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 14px; 
+    } 
+    /* Tabs */ 
+    .modal-tabs { 
+      display: flex; 
+      gap: 6px; 
+    } 
+    .modal-tab { 
+      flex: 1; 
+      font-family: var(--font-ui); 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 1px; 
+      padding: 9px 6px; 
+      border: 2px solid #ccc; 
+      color: #999; 
+      background: transparent; 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      box-shadow: 2px 2px 0 #ccc; 
+      transition: all .1s; 
+      position: static; 
+      border-radius: 0; 
+    } 
+    .modal-tab:hover { 
+      border-color: var(--ink); 
+      color: var(--ink); 
+      box-shadow: 2px 2px 0 var(--ink); 
+    } 
+    .modal-tab:active { 
+      transform: translate(2px,2px); 
+      box-shadow: 0 0 0; 
+    } 
+    .modal-tab.active { 
+      border-color: var(--ink); 
+      color: var(--white); 
+      background: var(--ink); 
+      box-shadow: 2px 2px 0 var(--ink); 
+    } 
+    /* Tables */ 
+    #friends-leaderboard { 
+      display: none; 
+      width: 100%; 
+    } 
+    .shame-table, .friends-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      font-size: clamp(10px, 2.5vw, 12px); 
+    } 
+    .shame-table thead tr, .friends-table thead tr { 
+      border-bottom: 2px solid var(--ink); 
+    } 
+    .shame-table th, .friends-table th { 
+      padding: 6px 10px; 
+      text-align: left; 
+      font-size: 7px; 
+      letter-spacing: 2px; 
+      color: #aaa; 
+      text-transform: uppercase; 
+    } 
+    .shame-table__row, .friends-table__row { 
+      border-bottom: 1px solid #e8e8e8; 
+    } 
+    .shame-table__row:hover, .friends-table__row:hover { 
+      background: #FAFAFA; 
+    } 
+    .shame-table__row--top { 
+      background: #FFF0F2; 
+    } 
+    .friends-table__row--gold { 
+      background: #FFFDE6; 
+    } 
+    .friends-table__row--neg { 
+      background: #FFF0F2; 
+    } 
+    .shame-table td, .friends-table td { 
+      padding: 10px 10px; 
+      vertical-align: middle; 
+    } 
+    .shame-table__rank, .friends-table__rank { 
+      color: #ccc; 
+      font-size: 10px; 
+    } 
+    .shame-table__name, .friends-table__name { 
+      color: var(--ink); 
+      font-weight: 700; 
+    } 
+    .shame-table__count { 
+      color: var(--red); 
+      text-align: center; 
+      font-family: var(--font-hero); 
+      font-size: 16px; 
+    } 
+    .friends-table__score { 
+      font-family: var(--font-hero); 
+      font-size: 14px; 
+      text-align: right; 
+    } 
+    .friends-table__score--pos { 
+      color: #006600; 
+    } 
+    .friends-table__score--neg { 
+      color: var(--red); 
+    } 
+    .shame-table__badge, .friends-table__badge { 
+      font-size: 8px; 
+      font-weight: 700; 
+      letter-spacing: 1px; 
+      padding: 3px 7px; 
+      border: 2px solid; 
+      white-space: nowrap; 
+    } 
+    .shame-table__badge--bad { 
+      color: var(--red); 
+      border-color: var(--red); 
+    } 
+    .shame-table__badge--ok { 
+      color: #006600; 
+      border-color: #006600; 
+    } 
+    .friends-table__badge--god { 
+      color: #006600; 
+      border-color: #006600; 
+    } 
+    .friends-table__badge--bad { 
+      color: var(--red); 
+      border-color: var(--red); 
+    } 
+    .friends-table__badge--neutral { 
+      color: #999; 
+      border-color: #999; 
+    } 
+    .shame-modal__note { 
+      font-size: 8px; 
+      color: #bbb; 
+      letter-spacing: 1px; 
+      border-top: 1px solid #eee; 
+      padding-top: 10px; 
+    } 
+    #close-shame-btn { 
+      font-family: var(--font-ui); 
+      font-size: 10px; 
+      font-weight: 700; 
+      letter-spacing: 2px; 
+      padding: 13px; 
+      border: var(--border); 
+      color: var(--white); 
+      background: var(--ink); 
+      cursor: pointer; 
+      text-transform: uppercase; 
+      box-shadow: var(--shadow-sm); 
+      transition: transform .06s, box-shadow .06s; 
+      position: static; 
+      align-self: stretch; 
+      border-radius: 0; 
+    } 
+    #close-shame-btn:active { 
+      transform: translate(5px,5px); 
+      box-shadow: 0 0 0 var(--ink); 
+    }
+
+    /* ===== MOBILE RESPONSIVE FIXES ===== */
+    @media screen and (max-width: 480px) {
+      /* Fix header layout for mobile */
+      .header {
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        }
+
+        .header__brand {
+          padding: 12px;
+          border-right: none;
+        }
+
+        #streak-counter {
+          font-size: 8px;
+          padding: 8px 10px;
+          border-left: var(--border);
+          border-right: none;
+        }
+
+        #login-btn-header {
+          font-size: 7px;
+          padding: 8px 10px;
+          border-left: var(--border);
+        }
+
+        #shame-btn {
+          font-size: 7px;
+          padding: 8px 10px;
+          border-left: var(--border);
+          white-space: nowrap;
+        }
+
+      
+
+      /* Fix streak widget card */
+      #streak-widget-card {
+        padding: 12px 10px;
+        gap: 8px;
+      }
+      
+      .streak-widget__fire {
+        font-size: 36px;
+      }
+      
+      .streak-widget__title {
+        font-size: 7px;
+        letter-spacing: 2px;
+      }
+      
+      .streak-widget__body {
+        font-size: 9px;
+        line-height: 1.4;
+      }
+
+      /* Fix timer box - ensure it stays within yellow panel */
+      .timer-box {
+        padding: 14px 4px 10px;
+      }
+      
+      .timer-box::before {
+        font-size: 6px;
+        padding: 2px 6px;
+      }
+      
+
+      /* Fix session tracker */
+      #session-tracker {
+        font-size: 7px;
+        letter-spacing: 2px;
+        flex-wrap: wrap;
+        padding: 7px 4px 5px;
+      }
+
+      /* Fix health bar container */
+      .health-wrapper {
+        width: 100%;
+      }
+      
+      #health-container {
+        height: 28px !important;
+      }
+      
+      #health-text {
+        font-size: 8px !important;
+      }
+      
+      .health-label {
+        font-size: 6px;
+        letter-spacing: 2px;
+      }
+
+      /* Fix pet stage */
+      .pet-stage {
+        min-height: 100px;
+        padding: 4px 0 2px;
+      }
+      
+      #pet-image {
+        font-size: 70px !important;
+      }
+
+      /* Fix roast box */
+      .roast-prompt {
+        padding: 10px 10px 12px;
+        gap: 6px;
+      }
+      
+      .roast-prompt::before {
+        font-size: 12px;
+      }
+      
+      #roast-box {
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      /* Fix action buttons */
+      .btn-row {
+        gap: 8px;
+      }
+      
+      button {
+        padding: 12px 4px;
+        font-size: 9px;
+        letter-spacing: 0.5px;
+      }
+
+      /* Fix footer */
+      .footer {
+        font-size: 7px;
+        letter-spacing: 1px;
+        padding-top: 8px;
+      }
+      
+      #status-label {
+        font-size: 6px;
+        padding: 2px 6px;
+      }
+
+      /* Fix content panel padding */
+      .content-panel {
+        padding: 16px 12px 18px;
+      }
+
+      /* Fix setup screen inputs */
+      .setup__row {
+        gap: 6px;
+      }
+      
+      .setup__input {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+      
+      .setup__label {
+        font-size: 7px;
+        letter-spacing: 2px;
+      }
+      
+      #lock-in-btn {
+        padding: 14px;
+      }
+
+      /* Fix apology input */
+      #apology-input {
+        font-size: 10px;
+        padding: 10px 12px;
+      }
+
+      /* Fix user profile */
+      #user-profile {
+        padding: 6px 10px;
+        font-size: 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      
+      #logout-btn {
+        padding: 3px 8px;
+        font-size: 6px;
+      }
+
+      /* Fix current goal display */
+      #current-goal-display {
+        font-size: 8px;
+        padding: 8px 10px;
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.4;
+      }
+    }
+
+    /* Extra small devices (below 360px) */
+    @media screen and (max-width: 360px) {
+      .header {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+          "brand"
+          "shame-btn"
+          "login"
+          "streak";
+      }
+      
+      #streak-counter {
+        border-top: var(--border);
+        border-left: none;
+      }
+      
+      #login-btn-header {
+        border-top: var(--border);
+        border-left: none;
+      }
+      
+      #shame-btn {
+        border-top: var(--border);
+        border-left: none;
+        text-align: center;
+      }
+      
+      .streak-widget__fire {
+        font-size: 30px;
+      }
+      
+      .streak-widget__text {
+        min-width: 0;
+      }
+      
+      #timer-display {
+        font-size: 48px;
+      }
+      
+      .btn-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .setup__row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      #pet-image {
+        font-size: 60px !important;
+      }
+    }
+
+    /* Fix for landscape mode on mobile */
+    @media screen and (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 16px 16px 40px;
+      }
+      
+      .card{
+      max-width:540px;
+      width:100%;
+    }
+      
+      .pet-stage {
+        min-height: 70px;
+      }
+      
+      #pet-image {
+        font-size: 50px !important;
+      }
+      
+      .btn-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Ensure content panel contains everything */
+    .content-panel {
+      overflow: hidden;
+      width: 100%;
+    }
+
+    /* Fix for the boards button being out of yellow box */
+    #shame-btn {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Ensure streak counter doesn't overflow */
+    #streak-counter {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+
+  </style>
+</head>
+<body> 
+  <!-- COMPLETION SCREEN (fixed overlay) --> 
+  <div id="completion-screen"> 
+    <div class="completion__trophy">🏆</div> 
+    <h2 class="completion__title">Task Survived.</h2> 
+    <p class="completion__goal"> You actually completed: <strong id="completion-goal-text">your goal</strong>.<br> Don't let it go to your head. </p> 
+    <div class="completion__btn-row" id="completion-btn-row"> 
+      <button id="new-task-btn">↺ Start a new task</button> 
+      <button id="enough-btn">✓ Enough for today</button> 
+    </div> 
+    <p class="completion__enough-msg" id="enough-msg">Finally. Go touch grass.</p> 
+  </div> 
+
+  <!-- LEADERBOARD MODAL (fixed overlay) --> 
+  <div id="shame-modal"> 
+    <div class="shame-modal__backdrop"></div> 
+    <div class="shame-modal__box"> 
+      <!-- Red header stripe --> 
+      <div class="shame-modal__header"> 
+        <span class="shame-modal__eyebrow">[ CLASSIFIED RECORDS ]</span> 
+        <h2 class="shame-modal__title" id="modal-title">☠ Corporate Hall of Shame ☠</h2> 
+        <p class="shame-modal__subtitle" id="modal-subtitle">These individuals have been found guilty of distraction.</p> 
+      </div> 
+      <div class="shame-modal__body"> 
+        <div class="modal-tabs"> 
+          <button class="modal-tab active" id="tab-shame">☠ Global Shame</button> 
+          <button class="modal-tab" id="tab-friends">🏆 Friends Weekly</button> 
+        </div> 
+        <div id="global-leaderboard"> 
+          <table class="shame-table"> 
+            <thead><tr><th>#</th><th>Name</th><th>Distractions</th><th>Sentence</th></tr></thead> 
+            <tbody id="global-leaderboard-body"> 
+              <tr class="shame-table__row shame-table__row--top"> 
+                <td class="shame-table__rank">01</td> 
+                <td class="shame-table__name">Harshit</td> 
+                <td class="shame-table__count">42</td> 
+                <td class="shame-table__badge shame-table__badge--bad">☠ Weakest Link</td> 
+              </tr> 
+              <tr class="shame-table__row"> 
+                <td class="shame-table__rank">02</td> 
+                <td class="shame-table__name">Dhruv</td> 
+                <td class="shame-table__count">3</td> 
+                <td class="shame-table__badge shame-table__badge--ok">✓ Acceptable</td> 
+              </tr> 
+            </tbody> 
+          </table> 
+        </div> 
+        <div id="friends-leaderboard"> 
+          <table class="friends-table"> 
+            <thead><tr><th>#</th><th>Name</th><th>Weekly XP</th><th>Title</th></tr></thead> 
+            <tbody id="friends-leaderboard-body"> 
+              <tr class="friends-table__row friends-table__row--gold"> 
+                <td class="friends-table__rank">01</td> 
+                <td class="friends-table__name">Dhruv</td> 
+                <td class="friends-table__score friends-table__score--pos">8,400 XP</td> 
+                <td class="friends-table__badge friends-table__badge--god">⚡ Focus God</td> 
+              </tr> 
+              <tr class="friends-table__row"> 
+                <td class="friends-table__rank">02</td> 
+                <td class="friends-table__name">Rahul</td> 
+                <td class="friends-table__score friends-table__score--pos">450 XP</td> 
+                <td class="friends-table__badge friends-table__badge--neutral">— Trying</td> 
+              </tr> 
+              <tr class="friends-table__row friends-table__row--neg"> 
+                <td class="friends-table__rank">03</td> 
+                <td class="friends-table__name">Harshit</td> 
+                <td class="friends-table__score friends-table__score--neg">-1,200 XP</td> 
+                <td class="friends-table__badge friends-table__badge--bad">💀 Chronically Distracted</td> 
+              </tr> 
+            </tbody> 
+          </table> 
+        </div> 
+        <p class="shame-modal__note">// updated in real-time. your failures are being logged.</p> 
+        <button id="close-shame-btn">✖ Close &amp; Reflect</button> 
+      </div> 
+    </div> 
+  </div> 
+
+  <!-- MAIN CARD --> 
+  <div class="card"> 
+    <!-- Header bar --> 
+    <div class="header"> 
+      <div class="header__brand"> 
+        <p class="header__eyebrow">productivity surveillance system</p> 
+        <h1 class="header__title">ToxiGotchi</h1> 
+      </div> 
+      <div id="streak-counter"><span class="fire">🔥</span> 0 Day Streak</div> 
+      <button id="login-btn-header">🔑 Login</button>
+      <button id="shame-btn">🏆&nbsp;Boards</button> 
+    </div> 
+
+    <!-- User Profile --> 
+    <div id="user-profile"> 
+      <span> <span id="user-name"></span> | XP: <span id="user-xp">0</span> | Streak: <span id="user-streak">0</span>🔥 </span> 
+      <button id="logout-btn">✖ Logout</button> 
+    </div> 
+
+    <!-- Content panel (yellow) --> 
+    <div class="content-panel"> 
+      <!-- SETUP SCREEN --> 
+      <div id="setup-screen"> 
+        <div id="streak-widget-card"> 
+          <div class="streak-widget__fire">🔥</div> 
+          <div class="streak-widget__text"> 
+            <p class="streak-widget__title">⚠ Daily Streak at Risk</p> 
+            <p class="streak-widget__body" id="streak-widget-body">Login to start your streak.</p> 
+          </div> 
+        </div> 
+        <h2 class="setup__title">Configure Your Suffering</h2> 
+        <p class="setup__subtitle">// session parameters — choose wisely</p> 
+        <div class="setup__field"> 
+          <label class="setup__label" for="goal-input">▸ Today's Goal</label> 
+          <input type="text" id="goal-input" class="setup__input" placeholder="What are you actually doing today?" autocomplete="off" maxlength="80" /> 
+        </div> 
+        <div class="setup__row"> 
+          <div class="setup__field"> 
+            <label class="setup__label" for="focus-time-input">▸ Focus (min)</label> 
+            <input type="number" id="focus-time-input" class="setup__input" value="25" min="1" max="120" /> 
+          </div> 
+          <div class="setup__field"> 
+            <label class="setup__label" for="break-time-input">▸ Break (min)</label> 
+            <input type="number" id="break-time-input" class="setup__input" value="5" min="1" max="60" /> 
+          </div> 
+        </div> 
+        <div class="setup__field"> 
+          <label class="setup__label" for="sessions-input">▸ Number of Sessions</label> 
+          <input type="number" id="sessions-input" class="setup__input" value="4" min="1" max="20" /> 
+        </div> 
+        <button id="lock-in-btn">⚡ Lock In</button> 
+      </div> 
+
+      <!-- MAIN APP --> 
+      <div id="main-app"> 
+        <div id="current-goal-display">🎯 Goal: —</div> 
+        <div id="session-tracker"> Session <span id="tracker-current">1</span> of <span id="tracker-total">4</span> &nbsp;|&nbsp; <span id="tracker-phase">Focus</span> </div> 
+        
+        <!-- Timer inside its own white box --> 
+        <div class="timer-box" data-label="FOCUS"> 
+          <div id="timer-display">25:00</div> 
+        </div> 
+        
+        <!-- Fighting-game health bar with labels --> 
+        <div class="health-wrapper"> 
+          <div class="health-label-row"> 
+            <span class="health-label">🐕 Pet HP</span> 
+            <span class="health-label" id="health-label-pct">100%</span> 
+          </div> 
+          <div id="health-container" style="width:100%;margin:0;background:#0A0A0A;border:3px solid #0A0A0A;border-radius:0;height:32px;position:relative;"> 
+            <div id="health-bar" style="width:100%;height:100%;background:#00FF41;transition:width 0.35s cubic-bezier(.4,0,.2,1),background-color 0.35s ease;border-radius:0;"></div> 
+            <span id="health-text" style="position:absolute;width:100%;text-align:center;top:50%;transform:translateY(-50%);color:white;font-family:'Press Start 2P',monospace;font-weight:bold;font-size:9px;text-shadow:1px 1px 0 #000;letter-spacing:2px;z-index:2;">100 / 100 HP</span> 
+          </div> 
+        </div> 
+        
+        <!-- Pet stage --> 
+        <div class="pet-stage"> 
+          <div id="pet-image" style="font-size:90px;line-height:1;display:block;text-align:center;margin:0 auto;filter:drop-shadow(4px 4px 0 rgba(0,0,0,.2));">🐕</div> 
+        </div> 
+        
+        <!-- Terminal roast box --> 
+        <div class="roast-wrapper"> 
+          <div class="roast-prompt"> 
+            <p id="roast-box">Login to start your session.</p> 
+          </div> 
+        </div> 
+        
+        <!-- Apology input (hidden until ransomware mode) --> 
+        <input type="text" id="apology-input" placeholder="Write a real apology — minimum 15 words..." autocomplete="off" /> 
+        
+        <!-- Action buttons --> 
+        <div class="btn-row"> 
+          <button id="start-btn">▶ Start Focus</button> 
+          <button id="give-up-btn" disabled>✖ Give Up</button> 
+        </div> 
+        
+        <!-- Footer --> 
+        <div class="footer"> 
+          <span>Session #<span id="session-count">0</span></span> 
+          <span id="status-label">IDLE</span> 
+        </div> 
+      </div> 
+    </div> 
+  </div> 
+
+  <script>
+    /* ──────────────────────────────────────────────────────
+       DOM REFERENCES
+    ────────────────────────────────────────────────────── */
+    const timerDisplay = document.getElementById('timer-display');
+    const petImage = document.getElementById('pet-image');
+    const roastBox = document.getElementById('roast-box');
+    const startBtn = document.getElementById('start-btn');
+    const giveUpBtn = document.getElementById('give-up-btn');
+    const apologyInput = document.getElementById('apology-input');
+    const statusLabel = document.getElementById('status-label');
+    const sessionCount = document.getElementById('session-count');
+    const shameBtn = document.getElementById('shame-btn');
+    const shameModal = document.getElementById('shame-modal');
+    const closeShameBtn = document.getElementById('close-shame-btn');
+    const loginBtn = document.getElementById('login-btn-header');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userProfile = document.getElementById('user-profile');
+    const userNameSpan = document.getElementById('user-name');
+    const userXpSpan = document.getElementById('user-xp');
+    const userStreakSpan = document.getElementById('user-streak');
+    
+    // Setup screen
+    const setupScreen = document.getElementById('setup-screen');
+    const mainApp = document.getElementById('main-app');
+    const goalInput = document.getElementById('goal-input');
+    const focusTimeInput = document.getElementById('focus-time-input');
+    const breakTimeInput = document.getElementById('break-time-input');
+    const sessionsInput = document.getElementById('sessions-input');
+    const lockInBtn = document.getElementById('lock-in-btn');
+    const currentGoalDisplay = document.getElementById('current-goal-display');
+    const streakWidgetBody = document.getElementById('streak-widget-body');
+    
+    // Session tracker
+    const sessionTracker = document.getElementById('session-tracker');
+    const trackerCurrent = document.getElementById('tracker-current');
+    const trackerTotal = document.getElementById('tracker-total');
+    const trackerPhase = document.getElementById('tracker-phase');
+    
+    // Completion screen
+    const completionScreen = document.getElementById('completion-screen');
+    const completionGoalText = document.getElementById('completion-goal-text');
+    const completionBtnRow = document.getElementById('completion-btn-row');
+    const newTaskBtn = document.getElementById('new-task-btn');
+    const enoughBtn = document.getElementById('enough-btn');
+    const enoughMsg = document.getElementById('enough-msg');
+    
+    // Modal tabs
+    const tabShame = document.getElementById('tab-shame');
+    const tabFriends = document.getElementById('tab-friends');
+    const globalPanel = document.getElementById('global-leaderboard');
+    const friendsPanel = document.getElementById('friends-leaderboard');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSubtitle = document.getElementById('modal-subtitle');
+    const globalLeaderboardBody = document.getElementById('global-leaderboard-body');
+    const friendsLeaderboardBody = document.getElementById('friends-leaderboard-body');
+
+    // Health bar elements
+    const healthBar = document.getElementById('health-bar');
+    const healthText = document.getElementById('health-text');
+    const healthLabelPct = document.getElementById('health-label-pct');
+
+    /* ──────────────────────────────────────────────────────
+       AUDIO SETUP
+    ────────────────────────────────────────────────────── */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let alarmInterval = null;
+    
+    function playHarshBeep() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    }
+
+    /* ──────────────────────────────────────────────────────
+       STATE VARIABLES
+    ────────────────────────────────────────────────────── */
+    let timeLeft = 1500;
+    let timerInterval = null;
+    let isTimerRunning = false;
+    let isHostageMode = false;
+    let sessions = 0;
+    let vibrationInterval;
+    let totalSessions = 4;
+    let currentSession = 1;
+    let isBreakTime = false;
+    let focusDuration = 1500;
+    let breakDuration = 300;
+    let targetEndTime = 0;
+    let petHealth = 100;
+    let isGameOver = false;
+    
+    // Firebase user state
+    let currentUser = null;
+    let userData = null;
+
+    /* ──────────────────────────────────────────────────────
+       UTILITY HELPERS
+    ────────────────────────────────────────────────────── */
+    function formatTime(secs) {
+      const m = String(Math.floor(secs / 60)).padStart(2, '0');
+      const s = String(secs % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function setRoast(msg, bad = false) {
+      roastBox.textContent = msg;
+      roastBox.className = bad ? 'bad' : '';
+    }
+
+    function setStatus(text) {
+      statusLabel.textContent = text;
+    }
+
+    function updateHealthUI() {
+      healthBar.style.width = petHealth + '%';
+      healthText.textContent = petHealth + ' / 100 HP';
+      healthLabelPct.textContent = petHealth + '%';
+      if (petHealth > 50) {
+        healthBar.style.backgroundColor = '#00ff00';
+      } else if (petHealth > 20) {
+        healthBar.style.backgroundColor = '#ffff00';
+      } else {
+        healthBar.style.backgroundColor = '#ff0000';
+      }
+    }
+
+    function updateTracker() {
+      trackerCurrent.textContent = currentSession;
+      trackerTotal.textContent = totalSessions;
+      if (isBreakTime) {
+        trackerPhase.textContent = 'Break';
+        sessionTracker.className = 'break-mode';
+      } else {
+        trackerPhase.textContent = 'Focus';
+        sessionTracker.className = '';
+      }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       FIREBASE FUNCTIONS
+    ────────────────────────────────────────────────────── */
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    // Check authentication state on load
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        // User is signed out, show login button
+        loginBtn.style.display = 'block';
+        userProfile.style.display = 'none';
+      } else {
+        // User is signed in
+        loginBtn.style.display = 'none';
+        currentUser = user;
+        initializeUser(user);
+      }
+    });
+
+    async function initializeUser(user) {
+      const userRef = db.collection('users').doc(user.uid);
+      const doc = await userRef.get();
+      
+      if (!doc.exists) {
+        // New user
+        userData = {
+          name: user.displayName,
+          email: user.email,
+          xp: 0,
+          distractions: 0,
+          sessionsCompleted: 0,
+          streak: 0,
+          lastActive: null,
+          createdAt: new Date().toISOString()
+        };
+        await userRef.set(userData);
+      } else {
+        userData = doc.data();
+        // Check if streak needs to be reset
+        await checkAndResetStreak(user);
+      }
+      
+      updateUI();
+    }
+
+    async function checkAndResetStreak(user) {
+      if (!userData.lastActive) return;
+      
+      const lastActiveDate = new Date(userData.lastActive);
+      const today = new Date();
+      
+      lastActiveDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = today - lastActiveDate;
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      
+      if (diffDays > 1) {
+        const userRef = db.collection('users').doc(user.uid);
+        await userRef.update({
+          streak: 0
+        });
+        userData.streak = 0;
+      }
+    }
+
+    function updateUI() {
+      if (!currentUser || !userData) return;
+      
+      userProfile.style.display = 'flex';
+      userNameSpan.textContent = userData.name || currentUser.displayName;
+      userXpSpan.textContent = userData.xp || 0;
+      userStreakSpan.textContent = userData.streak || 0;
+      
+      // Update streak displays
+      document.querySelector('#streak-counter').innerHTML = `<span class="fire">🔥</span> ${userData.streak || 0} Day Streak`;
+      
+      if (userData.streak > 0) {
+        streakWidgetBody.innerHTML = `You're on a <strong>${userData.streak}-day streak</strong>. Complete a focus session today to keep it alive.`;
+      } else {
+        streakWidgetBody.innerHTML = `Start your streak today! Complete a focus session.`;
+      }
+      
+      setRoast(`Welcome back, ${userData.name}. Ready to focus?`);
+      loadLeaderboards();
+    }
+
+    async function trackDistraction() {
+      if (!currentUser || !userData) return;
+      
+      try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        await userRef.update({
+          distractions: firebase.firestore.FieldValue.increment(1),
+          xp: firebase.firestore.FieldValue.increment(-50)
+        });
+        
+        userData.distractions = (userData.distractions || 0) + 1;
+        userData.xp = Math.max(0, (userData.xp || 0) - 50);
+        userXpSpan.textContent = userData.xp;
+        
+        loadLeaderboards();
+      } catch (error) {
+        console.error('Error tracking distraction:', error);
+      }
+    }
+
+    async function trackFocusCompletion() {
+      if (!currentUser || !userData) return;
+      
+      try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let streakUpdate = 1;
+        
+        if (userData.lastActive) {
+          const lastActive = new Date(userData.lastActive);
+          lastActive.setHours(0, 0, 0, 0);
+          
+          if (lastActive.getTime() === today.getTime()) {
+            streakUpdate = 0; // Already active today
+          } else {
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastActive.getTime() !== yesterday.getTime()) {
+              // Not consecutive - reset streak to 1
+              streakUpdate = 1;
+              userData.streak = 0;
+            }
+          }
+        }
+        
+        const newStreak = streakUpdate === 1 ? (userData.streak || 0) + 1 : userData.streak;
+        
+        await userRef.update({
+          xp: firebase.firestore.FieldValue.increment(100),
+          sessionsCompleted: firebase.firestore.FieldValue.increment(1),
+          streak: newStreak,
+          lastActive: new Date().toISOString()
+        });
+        
+        userData.xp = (userData.xp || 0) + 100;
+        userData.sessionsCompleted = (userData.sessionsCompleted || 0) + 1;
+        userData.streak = newStreak;
+        userData.lastActive = new Date().toISOString();
+        
+        userXpSpan.textContent = userData.xp;
+        userStreakSpan.textContent = userData.streak;
+        document.querySelector('#streak-counter').innerHTML = `<span class="fire">🔥</span> ${userData.streak} Day Streak`;
+        streakWidgetBody.innerHTML = `You're on a <strong>${userData.streak}-day streak</strong>. Complete a focus session today to keep it alive.`;
+        
+        loadLeaderboards();
+      } catch (error) {
+        console.error('Error tracking focus:', error);
+      }
+    }
+
+    async function loadLeaderboards() {
+      try {
+        // Global Shame (top distractions)
+        const shameSnapshot = await db.collection('users')
+          .orderBy('distractions', 'desc')
+          .limit(10)
+          .get();
+        
+        let shameHTML = '';
+        let rank = 1;
+        shameSnapshot.forEach(doc => {
+          const data = doc.data();
+          const isCurrentUser = currentUser && doc.id === currentUser.uid;
+          const rowClass = isCurrentUser ? 'shame-table__row--top' : '';
+          
+          let sentence = '✓ Acceptable';
+          if (data.distractions >= 50) sentence = '☠ Chronically Distracted';
+          else if (data.distractions >= 30) sentence = '☠ Weakest Link';
+          else if (data.distractions >= 10) sentence = '⚠️ Needs Improvement';
+          else if (data.distractions >= 5) sentence = '🤔 Getting Distracted';
+          
+          shameHTML += `
+            <tr class="shame-table__row ${rowClass}">
+              <td class="shame-table__rank">${String(rank).padStart(2, '0')}</td>
+              <td class="shame-table__name">${data.name} ${isCurrentUser ? '(You)' : ''}</td>
+              <td class="shame-table__count">${data.distractions || 0}</td>
+              <td class="shame-table__badge shame-table__badge--bad">${sentence}</td>
+            </tr>
+          `;
+          rank++;
+        });
+        globalLeaderboardBody.innerHTML = shameHTML;
+        
+        // Friends Weekly (top XP)
+        const xpSnapshot = await db.collection('users')
+          .orderBy('xp', 'desc')
+          .limit(10)
+          .get();
+        
+        let xpHTML = '';
+        rank = 1;
+        xpSnapshot.forEach(doc => {
+          const data = doc.data();
+          const isCurrentUser = currentUser && doc.id === currentUser.uid;
+          const rowClass = isCurrentUser ? 'friends-table__row--gold' : (rank === 1 ? 'friends-table__row--gold' : '');
+          
+          let title = '— Trying';
+          if (data.xp >= 10000) title = '⚡ Focus God';
+          else if (data.xp >= 5000) title = '🔥 Focus Master';
+          else if (data.xp >= 1000) title = '✨ Focus Apprentice';
+          else if (data.xp >= 100) title = '🌱 Getting Started';
+          
+          xpHTML += `
+            <tr class="friends-table__row ${rowClass}">
+              <td class="friends-table__rank">${String(rank).padStart(2, '0')}</td>
+              <td class="friends-table__name">${data.name} ${isCurrentUser ? '(You)' : ''}</td>
+              <td class="friends-table__score friends-table__score--pos">${(data.xp || 0).toLocaleString()} XP</td>
+              <td class="friends-table__badge ${data.xp >= 1000 ? 'friends-table__badge--god' : 'friends-table__badge--neutral'}">${title}</td>
+            </tr>
+          `;
+          rank++;
+        });
+        friendsLeaderboardBody.innerHTML = xpHTML;
+        
+      } catch (error) {
+        console.error('Error loading leaderboards:', error);
+      }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       AUTHENTICATION
+    ────────────────────────────────────────────────────── */
+    loginBtn.addEventListener('click', () => {
+      auth.signInWithPopup(provider)
+        .then(result => {
+          console.log('Logged in:', result.user);
+        })
+        .catch(error => {
+          console.error('Login error:', error);
+        });
+    });
+
+    /* ──────────────────────────────────────────────────────
+       LOGOUT HANDLER
+    ────────────────────────────────────────────────────── */
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        logoutBtn.disabled = true;
+        logoutBtn.textContent = '⏻';
+        
+        setRoast('Logging out... See you next time.');
+        
+        if (isTimerRunning) {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+        }
+        
+        if (vibrationInterval) {
+          clearInterval(vibrationInterval);
+          vibrationInterval = null;
+        }
+        
+        await auth.signOut();
+        
+        currentUser = null;
+        userData = null;
+        
+        window.location.href = 'index.html?_=' + Date.now();
+        
+      } catch (error) {
+        console.error('Logout error:', error);
+        window.location.replace('index.html');
+      }
+    });
+
+    /* ──────────────────────────────────────────────────────
+       SESSION SETUP
+    ────────────────────────────────────────────────────── */
+    lockInBtn.addEventListener('click', () => {
+      if (!currentUser) {
+        alert('Please login first!');
+        return;
+      }
+      if (!goalInput.value.trim()) {
+        alert('You need a goal to proceed.');
+        goalInput.focus();
+        return;
+      }
+
+      focusDuration = (parseInt(focusTimeInput.value, 10) || 25) * 60;
+      breakDuration = (parseInt(breakTimeInput.value, 10) || 5) * 60;
+      totalSessions = parseInt(sessionsInput.value, 10) || 4;
+
+      currentSession = 1;
+      isBreakTime = false;
+      timeLeft = focusDuration;
+      petHealth = 100;
+      updateHealthUI();
+
+      currentGoalDisplay.textContent = `🎯 Goal: ${goalInput.value.trim()}`;
+      timerDisplay.textContent = formatTime(timeLeft);
+      updateTracker();
+
+      setupScreen.style.display = 'none';
+      mainApp.style.display = 'flex';
+    });
+
+    /* ──────────────────────────────────────────────────────
+       TIMER
+    ────────────────────────────────────────────────────── */
+    startBtn.addEventListener('click', startTimer);
+
+    function startTimer() {
+      if (!currentUser) {
+        alert('Please login first!');
+        return;
+      }
+      if (isTimerRunning || isHostageMode) return;
+
+      if (isGameOver) {
+        isGameOver = false;
+        petHealth = 100;
+        currentSession = 1;
+        isBreakTime = false;
+        updateHealthUI();
+        petImage.innerText = '🐕';
+        petImage.className = '';
+        setRoast('A fresh start. Try not to fail.');
+        startBtn.textContent = '▶ Start Focus';
+        startBtn.disabled = false;
+        setStatus('IDLE');
+        return;
+      }
+
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (alarmInterval) {
+        clearInterval(alarmInterval);
+        alarmInterval = null;
+      }
+      document.title = 'ToxiGotchi';
+
+      sessions++;
+      sessionCount.textContent = sessions;
+
+      if (isBreakTime) {
+        startBtn.textContent = 'Break Running';
+        petImage.innerText = '🦮';
+        petImage.className = '';
+        setRoast('Enjoy your pathetic break.');
+        setStatus('BREAK');
+      } else {
+        startBtn.textContent = 'Focus Running';
+        petImage.innerText = '🐕';
+        petImage.className = '';
+        setRoast('Finally working. Prove me wrong.');
+        setStatus('FOCUSING');
+      }
+
+      timerDisplay.textContent = formatTime(timeLeft);
+      timerDisplay.classList.remove('danger');
+      updateTracker();
+      giveUpBtn.disabled = false;
+      startBtn.disabled = true;
+
+      isTimerRunning = true;
+      targetEndTime = Date.now() + (timeLeft * 1000);
+
+      timerInterval = setInterval(() => {
+        if (!isTimerRunning) return;
+
+        timeLeft = Math.round((targetEndTime - Date.now()) / 1000);
+        if (timeLeft < 0) timeLeft = 0;
+        timerDisplay.textContent = formatTime(timeLeft);
+
+        if (!isBreakTime && timeLeft <= 300) timerDisplay.classList.add('danger');
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+          timerDisplay.classList.remove('danger');
+          giveUpBtn.disabled = true;
+
+          if (!isBreakTime && currentSession < totalSessions) {
+            petHealth = Math.min(100, petHealth + 10);
+            updateHealthUI();
+            isBreakTime = true;
+            timeLeft = breakDuration;
+            timerDisplay.textContent = formatTime(timeLeft);
+            petImage.innerText = '🦮';
+            petImage.className = '';
+            startBtn.textContent = 'Start Break';
+            startBtn.disabled = false;
+            setRoast('Take a break.');
+            setStatus('BREAK');
+            updateTracker();
+          }
+          else if (!isBreakTime && currentSession === totalSessions) {
+            petHealth = Math.min(100, petHealth + 10);
+            updateHealthUI();
+            completionGoalText.textContent = goalInput.value.trim() || 'your goal';
+            mainApp.style.display = 'none';
+            completionScreen.style.display = 'flex';
+            trackFocusCompletion();
+          }
+          else if (isBreakTime && currentSession < totalSessions) {
+            currentSession++;
+            isBreakTime = false;
+            timeLeft = focusDuration;
+            timerDisplay.textContent = formatTime(timeLeft);
+            petImage.innerText = '🐕';
+            petImage.className = '';
+            startBtn.textContent = 'Start Focus';
+            startBtn.disabled = false;
+            updateTracker();
+            if (!alarmInterval) {
+              playHarshBeep();
+              alarmInterval = setInterval(playHarshBeep, 600);
+            }
+            setRoast('Break is over. WAKE UP.', true);
+            document.title = '⚠️ WAKE UP!';
+            setStatus('READY');
+          }
+        }
+      }, 1000);
+    }
+
+    /* ──────────────────────────────────────────────────────
+       FAIL STATE
+    ────────────────────────────────────────────────────── */
+    document.addEventListener('visibilitychange', () => {
+      if (isGameOver) return;
+      if (document.hidden && isTimerRunning && !isBreakTime) {
+        triggerFailState();
+      }
+    });
+
+    giveUpBtn.addEventListener('click', () => {
+      if (isTimerRunning) triggerFailState();
+    });
+
+    function triggerFailState() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+
+      petHealth = Math.max(0, petHealth - 25);
+      updateHealthUI();
+
+      if (petHealth === 0) {
+        isGameOver = true;
+        clearInterval(vibrationInterval);
+        if ("vibrate" in navigator) navigator.vibrate(0);
+        document.body.classList.remove('shake-screen');
+        apologyInput.style.display = 'none';
+        apologyInput.value = '';
+        startBtn.classList.remove('runaway-btn');
+        startBtn.style.position = 'static';
+        isHostageMode = false;
+        petImage.innerText = '🦴';
+        petImage.className = '';
+        document.getElementById('streak-counter').innerHTML = '<span class="fire">🔥</span> 0 Day Streak';
+        setRoast('You killed it. Game Over.', true);
+        setStatus('GAME OVER');
+        startBtn.textContent = '💀 Restart from Scratch';
+        startBtn.disabled = false;
+        giveUpBtn.disabled = true;
+        timerDisplay.classList.remove('danger');
+        timerDisplay.textContent = formatTime(timeLeft);
+        return;
+      }
+
+      if ("vibrate" in navigator) {
+        navigator.vibrate([300, 100, 300, 100, 500]);
+        vibrationInterval = setInterval(() => {
+          navigator.vibrate([300, 100, 300, 100, 500]);
+        }, 1300);
+      }
+
+      document.body.classList.add('shake-screen');
+      petImage.innerText = '🐺';
+      petImage.className = 'angry';
+
+      const goal = goalInput.value.trim();
+      const roastMsg = goal
+        ? `Wow. You couldn't even focus enough to "${goal}"? Pathetic.`
+        : 'Wow. A goldfish has better focus. Type an apology.';
+      setRoast(roastMsg, true);
+      setStatus('FAILURE');
+
+      giveUpBtn.disabled = true;
+      startBtn.disabled = false;
+      timerDisplay.classList.remove('danger');
+      timerDisplay.textContent = formatTime(timeLeft);
+
+      enableRansomwareMode();
+      trackDistraction();
+    }
+
+    /* ──────────────────────────────────────────────────────
+       RANSOMWARE MODE
+    ────────────────────────────────────────────────────── */
+    function enableRansomwareMode() {
+      isHostageMode = true;
+      apologyInput.style.display = 'block';
+      apologyInput.value = '';
+      apologyInput.focus();
+      startBtn.classList.add('runaway-btn');
+      startBtn.style.position = 'absolute';
+    }
+
+    startBtn.addEventListener('mouseover', () => {
+      if (!isHostageMode) return;
+
+      const MARGIN = 60;
+      const maxX = window.innerWidth - startBtn.offsetWidth - MARGIN;
+      const maxY = window.innerHeight - startBtn.offsetHeight - MARGIN;
+
+      const randomX = Math.floor(Math.random() * maxX) + MARGIN / 2;
+      const randomY = Math.floor(Math.random() * maxY) + MARGIN / 2;
+
+      startBtn.style.left = `${randomX}px`;
+      startBtn.style.top = `${randomY}px`;
+    });
+
+    /* ──────────────────────────────────────────────────────
+       APOLOGY UNLOCK
+    ────────────────────────────────────────────────────── */
+    apologyInput.addEventListener('input', () => {
+      if (isGameOver) return;
+
+      const raw = apologyInput.value.trim();
+      const words = raw.length ? raw.split(/\s+/) : [];
+      const count = words.length;
+      const hasKeyword = raw.toLowerCase().includes('sorry') || 
+                        raw.toLowerCase().includes('apologize') || 
+                        raw.toLowerCase().includes('mistake');
+
+      if (count < 15) {
+        setRoast(`Keep typing. I need at least 15 words. You only have ${count}.`, true);
+        return;
+      }
+
+      if (!hasKeyword) {
+        setRoast('Are you even sorry? I don\'t see "sorry" or "apologize".', true);
+        return;
+      }
+
+      isHostageMode = false;
+      clearInterval(vibrationInterval);
+      if ("vibrate" in navigator) navigator.vibrate(0);
+
+      startBtn.classList.remove('runaway-btn');
+      startBtn.style.position = 'static';
+      startBtn.style.left = '';
+      startBtn.style.top = '';
+
+      apologyInput.style.display = 'none';
+      apologyInput.value = '';
+      document.body.classList.remove('shake-screen');
+
+      petImage.innerText = '🐕';
+      petImage.className = '';
+      isBreakTime = false;
+      timeLeft = focusDuration;
+      timerDisplay.textContent = formatTime(timeLeft);
+      updateTracker();
+      setRoast('Fine. Apology accepted. Get back to work.');
+      setStatus('IDLE');
+    });
+
+    /* ──────────────────────────────────────────────────────
+       MODAL HANDLING
+    ────────────────────────────────────────────────────── */
+    shameBtn.addEventListener('click', () => {
+      shameModal.style.display = 'flex';
+      if (currentUser) loadLeaderboards();
+    });
+
+    closeShameBtn.addEventListener('click', () => {
+      shameModal.style.display = 'none';
+    });
+
+    shameModal.querySelector('.shame-modal__backdrop').addEventListener('click', () => {
+      shameModal.style.display = 'none';
+    });
+
+    tabShame.addEventListener('click', () => {
+      tabShame.classList.add('active');
+      tabFriends.classList.remove('active');
+      globalPanel.style.display = 'block';
+      friendsPanel.style.display = 'none';
+      modalTitle.textContent = '☠ Corporate Hall of Shame ☠';
+      modalSubtitle.textContent = 'These individuals have been found guilty of distraction.';
+    });
+
+    tabFriends.addEventListener('click', () => {
+      tabFriends.classList.add('active');
+      tabShame.classList.remove('active');
+      friendsPanel.style.display = 'block';
+      globalPanel.style.display = 'none';
+      modalTitle.textContent = '🏆 Friends Weekly';
+      modalSubtitle.textContent = 'Seven days. No excuses. Results below.';
+    });
+
+    /* ──────────────────────────────────────────────────────
+       COMPLETION SCREEN
+    ────────────────────────────────────────────────────── */
+    newTaskBtn.addEventListener('click', () => {
+      completionScreen.style.display = 'none';
+      enoughMsg.style.display = 'none';
+      completionBtnRow.style.display = 'flex';
+
+      currentSession = 1;
+      isBreakTime = false;
+      timeLeft = focusDuration;
+      sessions = 0;
+      petHealth = 100;
+      sessionCount.textContent = 0;
+      updateHealthUI();
+
+      goalInput.value = '';
+      focusTimeInput.value = '25';
+      breakTimeInput.value = '5';
+      sessionsInput.value = '4';
+      timerDisplay.textContent = '25:00';
+      timerDisplay.classList.remove('danger');
+      startBtn.textContent = '▶ Start Focus';
+      petImage.innerText = '🐕';
+      petImage.className = '';
+      setRoast('I am watching you. Start the timer.');
+      setStatus('IDLE');
+      giveUpBtn.disabled = true;
+      startBtn.disabled = false;
+
+      mainApp.style.display = 'none';
+      setupScreen.style.display = 'flex';
+    });
+
+    enoughBtn.addEventListener('click', () => {
+      completionBtnRow.style.display = 'none';
+      enoughMsg.style.display = 'block';
+    });
+
+    /* ──────────────────────────────────────────────────────
+       BROWSER EXIT WARNING
+    ────────────────────────────────────────────────────── */
+    window.addEventListener('beforeunload', function(e) {
+      if (isTimerRunning) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    function dodgeMousePointer() {}
+  </script>
+</body></html>
