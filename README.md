@@ -122,7 +122,7 @@ ToxiGotchi was created during the **Ship-in-a-Day Buildathon**, where teams were
 
 - Event: Ship-in-a-Day Buildathon by Github student community - SRMIST
 - Team Size: 2 Members
-- ⏱Development Time: 7 Hours
+- Development Time: 7 Hours
 - Outcome: Fully functional deployed web application
 
 This project demonstrates rapid prototyping, teamwork, problem-solving, and the ability to deliver a complete product under strict time constraints.
