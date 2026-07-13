@@ -174,7 +174,7 @@ Feel free to fork the repository, create a feature branch, and submit a pull req
 - _[Github](https://github.com/BhargavMalakonda)_
 - _[LinkedIn](https://www.linkedin.com/in/chaitanya-bhargav-malakonda/)_
 
-### Your Friend's Name
+### Dhruv Malu
 
 - _[Github](https://github.com/Dhruvmalu)_
 - _[LinkedIn](https://www.linkedin.com/in/dhruv-malu-845788324)_
