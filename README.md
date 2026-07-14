@@ -153,6 +153,28 @@ git clone https://github.com/BhargavMalakonda/toxigotchi-focus-companion.git
 cd toxigotchi
 ```
 
+## Firebase Setup
+
+To run this project locally:
+
+1. Create a Firebase project.
+2. Enable Authentication (Google Sign-In).
+3. Create a Firestore database.
+4. Replace the placeholder values in `index.html` with your Firebase configuration:
+
+```javascript
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+```
+
+Configure Firestore Security Rules according to your project's requirements before deploying.
+
 ### Run
 
 Simply open `index.html` in your browser or deploy using your preferred hosting service.
