@@ -4,10 +4,6 @@
 
 A gamified productivity web app that turns Pomodoro sessions into a virtual pet survival experience. Stay focused or your pet suffers the consequences.
 
-<p align="center">
-  <img src="assets/images/logo.png" alt="ToxiGotchi Logo" width="200" />
-</p>
-
 ![Status](https://img.shields.io/badge/Status-Completed-success)
 ![Built For](https://img.shields.io/badge/Built%20For-Ship--in--a--Day%20Buildathon-blue)
 ![Built In](https://img.shields.io/badge/Built%20In-7%20Hours-orange)
@@ -24,7 +20,7 @@ A gamified productivity web app that turns Pomodoro sessions into a virtual pet 
 
 ## Mobile Access
 
-### Option 1: Install it like an app
+### Install it like an app
 
 You can access ToxiGotchi from your Android device without cloning the source code:
 
@@ -35,13 +31,6 @@ You can access ToxiGotchi from your Android device without cloning the source co
 
 The availability and behavior of this option depend on the website's PWA configuration and your browser.
 
-### Option 2: Native Android Wrapper
-
-A dedicated Android wrapper for ToxiGotchi is available separately:
-
-🔗 **Android Repository:** [ToxiGotchi-Android](https://github.com/BhargavMalakonda/ToxiGotchi-Android)
-
-This is a native Android app that wraps the web experience, distinct from opening the website in a mobile browser.
 
 ---
 
@@ -57,16 +46,16 @@ Unlike traditional Pomodoro timers that simply notify users, ToxiGotchi gives ev
 
 ## Features
 
-- 🐕 **Virtual Pet** — A digital companion whose health depends on your focus
-- ⏱️ **Customizable Pomodoro Timer** — Set your own focus/break durations and session count
-- 🚨 **Tab-Switch Detection** — Switching tabs during a focus session damages your pet
-- 🔥 **Daily Streak Tracking** — Build consecutive focus days to maintain your streak
-- 🏆 **Leaderboards** — Global Hall of Shame and Friends Weekly XP rankings
-- ✍️ **Apology Gate** — Type a genuine apology (minimum 15 words) to unlock after a failed session
-- 📳 **Mobile Vibration Feedback** — Haptic alerts on supported devices
-- 🔐 **Google Authentication** — Secure sign-in via Firebase Auth
-- ☁️ **Cloud Sync** — Progress saved to Firebase Firestore
-- 📱 **Responsive Design** — Works on desktop and mobile
+- **Virtual Pet** — A digital companion whose health depends on your focus
+- **Customizable Pomodoro Timer** — Set your own focus/break durations and session count
+- **Tab-Switch Detection** — Switching tabs during a focus session damages your pet
+- **Daily Streak Tracking** — Build consecutive focus days to maintain your streak
+- **Leaderboards** — Global Hall of Shame and Friends Weekly XP rankings
+- **Apology Gate** — Type a genuine apology (minimum 15 words) to unlock after a failed session
+- **Mobile Vibration Feedback** — Haptic alerts on supported devices
+- **Google Authentication** — Secure sign-in via Firebase Auth
+- **Cloud Sync** — Progress saved to Firebase Firestore
+- **Responsive Design** — Works on desktop and mobile
 
 ---
 
@@ -173,27 +162,6 @@ toxigotchi-focus-companion/
 ├── LICENSE
 └── .gitignore
 ```
-
----
-
-## Deployment
-
-This is a static site with no build step. Deploy to any static host:
-
-### Vercel
-
-```bash
-npx vercel
-```
-
-### GitHub Pages
-
-1. Push to GitHub.
-2. Go to Settings → Pages.
-3. Set source to your main branch.
-4. Your site will be available at `https://username.github.io/toxigotchi-focus-companion/`.
-
-> **Note:** Make sure your Firebase config and authorized domains include your deployment URL.
 
 ---
 
